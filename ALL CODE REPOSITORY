@@ -1,0 +1,585 @@
+1. Single Responsibility Principle (SRP)
+A class should have only one reason to change.
+Explanation:
+Each class should do one thing and do it well. If a class has multiple responsibilities, changes in one part may break or affect the other parts.
+
+Example (Violation):
+Imagine we have a Book class that handles both the content of the book and saving it to a file.
+
+java Copy code
+class Book {
+    String title;
+    String author;
+
+    void printContent() {
+        System.out.println("Book content...");
+    }
+
+    void saveToFile(String filePath) {
+        System.out.println("Saving to file: " + filePath);
+    }
+}
+Problem:
+If we need to change how the book is saved (e.g., save to a database instead), we must modify the Book class. But saving and content handling are two different responsibilities.
+
+Fix:
+Separate responsibilities into different classes:
+
+java Copy code
+class Book {
+    String title;
+    String author;
+
+    void printContent() {
+        System.out.println("Book content...");
+    }
+}
+
+class BookPersistence {
+    void saveToFile(Book book, String filePath) {
+        System.out.println("Saving '" + book.title + "' to file: " + filePath);
+    }
+}
+Now, the Book class handles only book content, and the BookPersistence class handles saving. If we change the way books are saved, it won’t affect the Book class.
+
+
+
+COMPLETE CODE : 
+
+// SOLID Principles Explained with Code
+
+// 1. Single Responsibility Principle (SRP)
+// Explanation:
+// Each class should have one responsibility. If a class handles multiple tasks, changes in one area may affect others.
+
+// Example:
+class Book {
+    String title;
+    String author;
+
+    void printContent() {
+        System.out.println("Book content...");
+    }
+}
+
+class BookPersistence {
+    void saveToFile(Book book, String filePath) {
+        System.out.println("Saving '" + book.title + "' to file: " + filePath);
+    }
+}
+
+// Usage:
+// The Book class handles book content, and BookPersistence handles saving it.
+Book book = new Book();
+book.title = "SOLID Principles";
+BookPersistence persistence = new BookPersistence();
+persistence.saveToFile(book, "solid_principles.txt");
+
+
+========================================================================================================================================================================================
+2.2. Open/Closed Principle (OCP)
+A class should be open for extension but closed for modification.
+Explanation:
+You should be able to add new features to a class without modifying its existing code. This reduces the risk of breaking the existing functionality.
+
+Example (Violation):
+Suppose you have a Shape class that calculates the area of different shapes.
+
+java
+Copy code
+class Shape {
+    String type;
+    double length;
+    double breadth;
+    double radius;
+
+    double calculateArea() {
+        if (type.equals("Rectangle")) {
+            return length * breadth;
+        } else if (type.equals("Circle")) {
+            return Math.PI * radius * radius;
+        }
+        return 0;
+    }
+}
+Problem:
+If we add a new shape (e.g., a triangle), we have to modify the calculateArea method. This violates OCP.
+
+Fix:
+Use polymorphism by creating an abstract class or interface:
+
+java Copy code
+abstract class Shape {
+    abstract double calculateArea();
+}
+
+class Rectangle extends Shape {
+    double length, breadth;
+
+    Rectangle(double length, double breadth) {
+        this.length = length;
+        this.breadth = breadth;
+    }
+
+    double calculateArea() {
+        return length * breadth;
+    }
+}
+
+class Circle extends Shape {
+    double radius;
+
+    Circle(double radius) {
+        this.radius = radius;
+    }
+
+    double calculateArea() {
+        return Math.PI * radius * radius;
+    }
+}
+Now, to add a new shape (e.g., a triangle), you just create a new class without modifying existing ones.
+
+
+
+
+// 2. Open/Closed Principle (OCP)
+// Explanation:
+// Classes should be open for extension but closed for modification. You should be able to add new functionality without altering existing code.
+
+// Example:
+abstract class Shape {
+    abstract double calculateArea();
+}
+
+class Rectangle extends Shape {
+    double length, breadth;
+
+    Rectangle(double length, double breadth) {
+        this.length = length;
+        this.breadth = breadth;
+    }
+
+    double calculateArea() {
+        return length * breadth;
+    }
+}
+
+class Circle extends Shape {
+    double radius;
+
+    Circle(double radius) {
+        this.radius = radius;
+    }
+
+    double calculateArea() {
+        return Math.PI * radius * radius;
+    }
+}
+
+// Usage:
+// Adding new shapes (e.g., Triangle) doesn't require modifying existing classes.
+Shape rectangle = new Rectangle(5, 10);
+Shape circle = new Circle(7);
+System.out.println("Rectangle area: " + rectangle.calculateArea());
+System.out.println("Circle area: " + circle.calculateArea());
+
+
+=======================================================================================================================================================================================
+3. The Liskov Substitution Principle (LSP) is one of the SOLID principles of object-oriented design. It states that:
+
+Objects of a subclass should be able to replace objects of their parent class without affecting the functionality of the program.
+
+In simpler words, you should be able to use a child class wherever the parent class is expected, and everything should still work correctly.
+
+Key Idea
+When you create a subclass, it should not break or change the behavior of the code that uses the parent class.
+
+Example (Basic Code)
+Let’s say we have a Bird class. Birds can fly, so we write a fly method.
+
+java
+Copy code
+class Bird {
+    void fly() {
+        System.out.println("This bird is flying.");
+    }
+}
+Now we create a subclass Sparrow (a type of bird). Since sparrows can fly, it works perfectly fine:
+
+java
+Copy code
+class Sparrow extends Bird {
+    // Inherits the fly() method from Bird
+}
+So if you do this:
+
+java
+Copy code
+Bird bird = new Sparrow();
+bird.fly(); // Output: "This bird is flying."
+It works fine because the Sparrow subclass behaves the same way as the Bird class.
+
+What Happens When LSP is Violated?
+Now, let’s add another subclass Penguin. Penguins are birds, but they cannot fly.
+
+java
+Copy code
+class Penguin extends Bird {
+    @Override
+    void fly() {
+        throw new UnsupportedOperationException("Penguins can't fly!");
+    }
+}
+Now, if someone writes this:
+
+java
+Copy code
+Bird bird = new Penguin();
+bird.fly(); // Throws an exception!
+This violates the Liskov Substitution Principle because the Penguin subclass does not behave like its parent Bird class. Instead of flying, it breaks the expected behavior.
+
+How to Fix It?
+To fix the violation, we need to rethink our design. We should not assume that all birds can fly.
+
+Instead, we can introduce an interface Flyable for birds that can fly.
+
+java
+Copy code
+interface Flyable {
+    void fly();
+}
+
+class Bird {
+    void eat() {
+        System.out.println("This bird is eating.");
+    }
+}
+
+class Sparrow extends Bird implements Flyable {
+    public void fly() {
+        System.out.println("Sparrow is flying.");
+    }
+}
+
+class Penguin extends Bird {
+    // Penguins don't implement Flyable because they can't fly
+}
+Now, when we use the classes:
+
+java
+Copy code
+Flyable flyingBird = new Sparrow();
+flyingBird.fly(); // Works fine
+
+Bird penguin = new Penguin();
+penguin.eat(); // Penguins can eat, but they don’t fly
+Summary:
+* LSP says subclasses must behave like their parent class.
+* If a method works with the parent class, it should also work with the subclass without breaking.
+* Violating LSP leads to unexpected behavior or errors, as in the Penguin example.
+* To fix it, rethink your design and ensure subclasses only extend functionality logically. Use interfaces when behaviors differ.
+
+
+COMPLETE CODE PART :
+
+// 3. Liskov Substitution Principle (LSP)
+// Explanation:
+// Subclasses should be replaceable with their base classes without altering the correctness of the program.
+
+// Incorrect Design Example:
+class Bird {
+    void fly() {
+        System.out.println("This bird is flying.");
+    }
+}
+
+class Sparrow extends Bird {
+    // Inherits the fly() method
+}
+
+class Penguin extends Bird {
+    @Override
+    void fly() {
+        throw new UnsupportedOperationException("Penguins can't fly!");
+    }
+}
+
+// Correct Design:
+interface Flyable {
+    void fly();
+}
+
+class FlyingBird implements Flyable {
+    public void fly() {
+        System.out.println("This bird is flying.");
+    }
+}
+
+class NonFlyingBird {
+    // Does not implement Flyable
+}
+
+
+=======================================================================================================================================================================================
+4.  4. Interface Segregation Principle (ISP)
+
+A class should not be forced to implement methods it doesn’t use.
+Explanation:
+Split large interfaces into smaller, more specific ones. This way, a class only implements what it needs.
+
+Example (Violation):
+Suppose we have an interface for workers in a company:
+
+java
+Copy code
+interface Worker {
+    void work();
+    void attendMeetings();
+}
+Now, both Developer and Robot implement this interface:
+
+java
+Copy code
+class Developer implements Worker {
+    public void work() {
+        System.out.println("Writing code...");
+    }
+
+    public void attendMeetings() {
+        System.out.println("Attending meetings...");
+    }
+}
+
+class Robot implements Worker {
+    public void work() {
+        System.out.println("Performing automated tasks...");
+    }
+
+    public void attendMeetings() {
+        // Robots don’t attend meetings!
+        throw new UnsupportedOperationException("Robots don’t attend meetings.");
+    }
+}
+Problem:
+The Robot class is forced to implement a method (attendMeetings) it doesn’t need, leading to unused or error-prone code.
+
+Fix:
+Split the Worker interface into smaller, specific interfaces:
+
+java
+Copy code
+interface Workable {
+    void work();
+}
+
+interface Attendable {
+    void attendMeetings();
+}
+
+class Developer implements Workable, Attendable {
+    public void work() {
+        System.out.println("Writing code...");
+    }
+
+    public void attendMeetings() {
+        System.out.println("Attending meetings...");
+    }
+}
+
+class Robot implements Workable {
+    public void work() {
+        System.out.println("Performing automated tasks...");
+    }
+}
+Now, Robot doesn’t have to implement the attendMeetings method.
+
+
+
+
+// 4. Interface Segregation Principle (ISP)
+// Explanation:
+// Interfaces should be specific to what a class needs. Avoid forcing classes to implement unnecessary methods.
+
+// Example:
+interface Workable {
+    void work();
+}
+
+interface Attendable {
+    void attendMeetings();
+}
+
+class Developer implements Workable, Attendable {
+    public void work() {
+        System.out.println("Writing code...");
+    }
+
+    public void attendMeetings() {
+        System.out.println("Attending meetings...");
+    }
+}
+
+class Robot implements Workable {
+    public void work() {
+        System.out.println("Performing automated tasks...");
+    }
+}
+
+// Usage:
+// Developer and Robot implement only the methods they need.
+Workable developer = new Developer();
+Workable robot = new Robot();
+developer.work();
+robot.work();
+
+
+========================================================================================================================================================================================
+5. 5. Dependency Inversion Principle (DIP)
+High-level modules should not depend on low-level modules. Both should depend on abstractions.
+Explanation:
+Instead of directly depending on concrete classes, rely on interfaces or abstract classes. This makes your code more flexible and easier to maintain.
+
+Example (Violation):
+Suppose you have a class FrontendDeveloper and BackendDeveloper, and a Project class depends directly on them:
+
+java
+Copy code
+class FrontendDeveloper {
+    void writeCode() {
+        System.out.println("Writing frontend code...");
+    }
+}
+
+class BackendDeveloper {
+    void writeCode() {
+        System.out.println("Writing backend code...");
+    }
+}
+
+class Project {
+    FrontendDeveloper frontend = new FrontendDeveloper();
+    BackendDeveloper backend = new BackendDeveloper();
+
+    void develop() {
+        frontend.writeCode();
+        backend.writeCode();
+    }
+}
+Problem:
+If you add a new type of developer (e.g., MobileDeveloper), you have to modify the Project class. The Project class is tightly coupled to specific developer classes.
+
+Fix:
+Introduce an abstraction (interface):
+
+java
+Copy code
+interface Developer {
+    void writeCode();
+}
+
+class FrontendDeveloper implements Developer {
+    public void writeCode() {
+        System.out.println("Writing frontend code...");
+    }
+}
+
+class BackendDeveloper implements Developer {
+    public void writeCode() {
+        System.out.println("Writing backend code...");
+    }
+}
+
+class Project {
+    private List<Developer> developers;
+
+    Project(List<Developer> developers) {
+        this.developers = developers;
+    }
+
+    void develop() {
+        developers.forEach(Developer::writeCode);
+    }
+}
+Now, you can add new types of developers (e.g., MobileDeveloper) without modifying the Project class:
+
+java
+Copy code
+class MobileDeveloper implements Developer {
+    public void writeCode() {
+        System.out.println("Writing mobile code...");
+    }
+}
+Summary of SOLID:
+SRP: Each class should have one job.
+OCP: Extend a class without modifying existing code.
+LSP: Subclasses must behave like their parent class.
+ISP: Don’t force classes to implement methods they don’t use.
+DIP: Depend on abstractions, not concrete classes.
+
+
+
+
+COMPLETE CODE PART :
+
+// 5. Dependency Inversion Principle (DIP)
+// Explanation:
+// High-level modules should not depend on low-level modules. Both should depend on abstractions.
+
+// Example:
+interface Developer {
+    void writeCode();
+}
+
+class FrontendDeveloper implements Developer {
+    public void writeCode() {
+        System.out.println("Writing frontend code...");
+    }
+}
+
+class BackendDeveloper implements Developer {
+    public void writeCode() {
+        System.out.println("Writing backend code...");
+    }
+}
+
+class MobileDeveloper implements Developer {
+    public void writeCode() {
+        System.out.println("Writing mobile code...");
+    }
+}
+
+class Project {
+    private List<Developer> developers;
+
+    Project(List<Developer> developers) {
+        this.developers = developers;
+    }
+
+    void develop() {
+        developers.forEach(Developer::writeCode);
+    }
+}
+
+// Usage:
+// The Project class depends on the Developer interface, not specific implementations.
+List<Developer> devs = Arrays.asList(new FrontendDeveloper(), new BackendDeveloper(), new MobileDeveloper());
+Project project = new Project(devs);
+project.develop();
+========================================================================================================================================================================================
+
+
+
+@Author
+Abhishek Anand
+
+
+
+
+
+
+
+
+
+
+
+
