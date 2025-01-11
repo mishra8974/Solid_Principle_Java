@@ -1,2 +1,3 @@
 # Solid_Principle_Java
-Easy Explanation For SOLID Principle in java .
+Easy Explanation of SOLID Principle in java .
+Along with the easy explanation with Code part 
